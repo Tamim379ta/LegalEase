@@ -4,6 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Form, Button, TextField, Label, Input, FieldError } from "@heroui/react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
+import toast from "react-hot-toast";
+
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -16,10 +19,19 @@ const SignInPage = () => {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    const { email, password } = Object.fromEntries(formData.entries());
 
-    console.log(data);
+    const { data, error } = await authClient.signIn.email({
+      email,
+      password,
+    });
 
+    if (data) {
+      toast.success("Login successful");
+    }
+    else {
+      toast.error("Something went wrong");
+    }
     // Simulate API delay
     setTimeout(() => {
       setLoading(false);

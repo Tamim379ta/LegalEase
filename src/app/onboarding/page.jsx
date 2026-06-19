@@ -2,173 +2,78 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@heroui/react";
+import { FaUserTie, FaUser } from "react-icons/fa";
 
-const OnboardingPage = () => {
+const ChooseRolePage = () => {
   const router = useRouter();
-
-  const [step, setStep] = useState(1);
-  const [role, setRole] = useState("");
+  const [selected, setSelected] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  // lawyer extra fields
-  const [form, setForm] = useState({
-    fullName: "",
-    location: "",
-    barCouncil: "",
-    experience: "",
-    specialization: "",
-  });
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleRoleSubmit = () => {
-    if (!role) return;
-    setStep(2);
-  };
-
-  const handleFinish = async () => {
+  const handleContinue = async () => {
+    if (!selected) return;
+    setError("");
     setLoading(true);
 
-    try {
-      // 👇 send to backend
-      const res = await fetch("/api/onboarding", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role,
-          ...form,
-          isOnboarded: true,
-        }),
-      });
 
-      if (!res.ok) throw new Error("Failed");
-
-      // redirect based on role
-      if (role === "client") {
-        router.push("/dashboard/client");
-      } else {
-        router.push("/dashboard/lawyer");
-      }
-    } catch (err) {
-      console.log(err);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#0f1c2b] via-[#1A2E44] to-[#0d1117] px-4">
-      <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-xl text-white">
+    <div className="min-h-screen flex items-center justify-center bg-[#1c4168] px-4">
+      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl p-8 shadow-2xl">
+        <div className="mb-8 text-center">
+          <h1 className="text-2xl font-bold text-white">How will you use LegalEase?</h1>
+          <p className="mt-2 text-sm text-gray-400">
+            Choose the option that fits you best
+          </p>
+        </div>
 
-        {/* Header */}
-        <h1 className="text-2xl font-bold text-center mb-2">
-          Complete Your Profile
-        </h1>
-        <p className="text-gray-400 text-center mb-6">
-          Tell us more about you to continue
-        </p>
-
-        {/* STEP 1 */}
-        {step === 1 && (
-          <div>
-            <p className="mb-4 text-gray-300">I am a:</p>
-
-            <div className="grid grid-cols-2 gap-4">
-              <button
-                onClick={() => setRole("client")}
-                className={`p-4 rounded-xl border transition ${role === "client"
-                    ? "border-[#814f30] bg-[#814f30]/20"
-                    : "border-white/10"
-                  }`}
-              >
-                👤 Client
-              </button>
-
-              <button
-                onClick={() => setRole("lawyer")}
-                className={`p-4 rounded-xl border transition ${role === "lawyer"
-                    ? "border-[#814f30] bg-[#814f30]/20"
-                    : "border-white/10"
-                  }`}
-              >
-                ⚖️ Lawyer
-              </button>
+        <div className="flex flex-col gap-4">
+          <button
+            type="button"
+            onClick={() => setSelected("client")}
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "client"
+                ? "border-[#814f30] bg-[#814f30]/20"
+                : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
+              }`}
+          >
+            <FaUser className="text-xl text-[#d09a75]" />
+            <div>
+              <p className="font-medium text-white">I'm a Client</p>
             </div>
+          </button>
 
-            <button
-              onClick={handleRoleSubmit}
-              className="mt-6 w-full h-12 rounded-xl bg-[#814f30] hover:bg-[#9a633c] transition font-semibold"
-            >
-              Continue
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setSelected("lawyer")}
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "lawyer"
+                ? "border-[#814f30] bg-[#814f30]/20"
+                : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
+              }`}
+          >
+            <FaUserTie className="text-xl text-[#d09a75]" />
+            <div>
+              <p className="font-medium text-white">I'm a Lawyer</p>
+            </div>
+          </button>
+        </div>
+
+        {error && (
+          <p className="mt-4 text-sm text-red-400">{error}</p>
         )}
 
-        {/* STEP 2 */}
-        {step === 2 && (
-          <div className="space-y-4">
-
-            <input
-              name="fullName"
-              placeholder="Full Name"
-              value={form.fullName}
-              onChange={handleChange}
-              className="w-full h-12 px-4 rounded-xl bg-[#102235] border border-white/10 outline-none focus:border-[#814f30]"
-            />
-
-            <input
-              name="location"
-              placeholder="Location"
-              value={form.location}
-              onChange={handleChange}
-              className="w-full h-12 px-4 rounded-xl bg-[#102235] border border-white/10 outline-none focus:border-[#814f30]"
-            />
-
-            {/* Lawyer-only fields */}
-            {role === "lawyer" && (
-              <>
-                <input
-                  name="barCouncil"
-                  placeholder="Bar Council ID"
-                  value={form.barCouncil}
-                  onChange={handleChange}
-                  className="w-full h-12 px-4 rounded-xl bg-[#102235] border border-white/10 outline-none focus:border-[#814f30]"
-                />
-
-                <input
-                  name="experience"
-                  placeholder="Years of Experience"
-                  value={form.experience}
-                  onChange={handleChange}
-                  className="w-full h-12 px-4 rounded-xl bg-[#102235] border border-white/10 outline-none focus:border-[#814f30]"
-                />
-
-                <input
-                  name="specialization"
-                  placeholder="Specialization (e.g. Criminal Law)"
-                  value={form.specialization}
-                  onChange={handleChange}
-                  className="w-full h-12 px-4 rounded-xl bg-[#102235] border border-white/10 outline-none focus:border-[#814f30]"
-                />
-              </>
-            )}
-
-            <button
-              onClick={handleFinish}
-              disabled={loading}
-              className="w-full h-12 rounded-xl bg-[#814f30] hover:bg-[#9a633c] transition font-semibold"
-            >
-              {loading ? "Saving..." : "Finish Setup"}
-            </button>
-          </div>
-        )}
+        <Button
+          isDisabled={!selected}
+          isLoading={loading}
+          onPress={handleContinue}
+          className="mt-6 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white disabled:opacity-50"
+        >
+          Continue
+        </Button>
       </div>
     </div>
   );
 };
 
-export default OnboardingPage;
+export default ChooseRolePage;

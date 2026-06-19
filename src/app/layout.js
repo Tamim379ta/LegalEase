@@ -2,6 +2,7 @@ import { Lato, Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
+import { Toaster } from "react-hot-toast";
 
 const poppins = Lato({
   weight: ['100', '300', '400', '700', '900'],
@@ -18,7 +19,10 @@ export default function RootLayout({ children }) {
     <html lang="en" className={poppins.className}>
       <body className="min-h-screen flex flex-col">
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <main className="flex-1"> 
+          {children} 
+          <Toaster/>
+          </main>
         <Footer />
       </body>
     </html>

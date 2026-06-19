@@ -4,8 +4,12 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { Form, Button, TextField, Label, Input, FieldError } from "@heroui/react";
 import { FaEnvelope, FaLock, FaUser, FaEye, FaEyeSlash } from "react-icons/fa";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,37 +19,22 @@ const SignUpPage = () => {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData.entries());
+    const { email, password, name } = Object.fromEntries(formData.entries());
 
-    if (data.password !== data.confirmPassword) {
-      setError("Passwords do not match");
-      return;
+    const { data, error } = await authClient.signUp.email({
+      email, 
+      password, 
+      name, 
+    });
+
+    if(data) {
+      toast.success("Account created successfully");
+      router.push("/onboarding");
+    }
+    else {
+      toast.error("Something went wrong");
     }
 
-    try {
-      setLoading(true);
-
-      const res = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
-      });
-
-      if (!res.ok) {
-        const result = await res.json().catch(() => ({}));
-        throw new Error(result.message || "Something went wrong");
-      }
-
-      // Redirect or handle success here
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (
@@ -56,7 +45,7 @@ const SignUpPage = () => {
 
       {/* Card */}
       <div className="relative w-full max-w-md rounded-3xl border border-[#2A486A]/50 bg-[#1F3752]/60 backdrop-blur-xl p-8 shadow-2xl">
-        
+
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-[#814f30]/30 bg-[#814f30]/10">
@@ -81,14 +70,14 @@ const SignUpPage = () => {
 
         {/* Form */}
         <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          
+
           {/* Full Name Field */}
           <TextField name="name" type="text" isRequired className="w-full flex flex-col gap-1.5">
             <Label className="text-xs font-semibold text-slate-200">Full Name</Label>
             <div className="relative flex items-center">
               <FaUser className="absolute left-4 text-slate-400 pointer-events-none" size={14} />
-              <Input 
-                placeholder="John Doe" 
+              <Input
+                placeholder="John Doe"
                 className="w-full h-11 pl-11 pr-4 rounded-xl bg-[#1A2E44]/80 border border-[#2A486A] text-white placeholder:text-slate-500 transition-colors hover:border-[#814f30]/60 focus:border-[#814f30] focus:outline-none"
               />
             </div>
@@ -100,8 +89,8 @@ const SignUpPage = () => {
             <Label className="text-xs font-semibold text-slate-200">Email Address</Label>
             <div className="relative flex items-center">
               <FaEnvelope className="absolute left-4 text-slate-400 pointer-events-none" size={14} />
-              <Input 
-                placeholder="you@example.com" 
+              <Input
+                placeholder="you@example.com"
                 className="w-full h-11 pl-11 pr-4 rounded-xl bg-[#1A2E44]/80 border border-[#2A486A] text-white placeholder:text-slate-500 transition-colors hover:border-[#814f30]/60 focus:border-[#814f30] focus:outline-none"
               />
             </div>
@@ -113,9 +102,9 @@ const SignUpPage = () => {
             <Label className="text-xs font-semibold text-slate-200">Password</Label>
             <div className="relative flex items-center">
               <FaLock className="absolute left-4 text-slate-400 pointer-events-none" size={14} />
-              <Input 
+              <Input
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••" 
+                placeholder="••••••••"
                 className="w-full h-11 pl-11 pr-12 rounded-xl bg-[#1A2E44]/80 border border-[#2A486A] text-white placeholder:text-slate-500 transition-colors hover:border-[#814f30]/60 focus:border-[#814f30] focus:outline-none"
               />
               <button
@@ -129,7 +118,7 @@ const SignUpPage = () => {
             <FieldError className="text-xs text-red-400 mt-0.5" />
           </TextField>
 
-        
+
           {/* Submit Button */}
           <Button
             type="submit"
