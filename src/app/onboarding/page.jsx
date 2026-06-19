@@ -4,19 +4,20 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@heroui/react";
 import { FaUserTie, FaUser } from "react-icons/fa";
+import { selectRole } from "@/lib/action/userRole";
 
 const ChooseRolePage = () => {
   const router = useRouter();
   const [selected, setSelected] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleContinue = async () => {
+ 
     if (!selected) return;
-    setError("");
-    setLoading(true);
-
-
+    const updateRole = await selectRole(selected);
+    if (updateRole){
+      router.push("/");
+    }
+   
   };
 
   return (
@@ -59,13 +60,9 @@ const ChooseRolePage = () => {
           </button>
         </div>
 
-        {error && (
-          <p className="mt-4 text-sm text-red-400">{error}</p>
-        )}
-
+       
         <Button
           isDisabled={!selected}
-          isLoading={loading}
           onPress={handleContinue}
           className="mt-6 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white disabled:opacity-50"
         >

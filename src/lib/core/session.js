@@ -1,6 +1,9 @@
-import { authClient } from "../auth-client";
+import { headers } from "next/headers";
+import { auth } from "../auth";
 
 export const getUserSession = async () => {
-  const session = await authClient.getSession();
-  return session;
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  return session?.user;
 };

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+
 const HeroPage = () => {
   return (
     <section className="relative w-full h-150 md:h-170 flex items-center justify-center text-center overflow-hidden">
