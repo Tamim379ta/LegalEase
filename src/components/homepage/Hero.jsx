@@ -10,7 +10,7 @@ const HeroPage = () => {
         alt="Hero background"
         fill
         priority
-        className="object-cover object-center"
+        className="object-cover object-center "
       />
 
       {/* Dark overlay */}

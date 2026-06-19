@@ -62,13 +62,13 @@ const Navbar = () => {
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-2.5">
           <Link
-            href="/login"
+            href="/signIn"
             className="px-4 py-2 rounded-lg text-sm font-medium text-[#814f30] border border-[#814f30] hover:bg-[#814f30] hover:text-white transition-all"
           >
             Log in
           </Link>
           <Link
-            href="/register"
+            href="/signUp"
             className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#814f30] hover:bg-[#6b3f24] transition-all"
           >
             Get Started
@@ -121,14 +121,14 @@ const Navbar = () => {
           {/* Mobile Actions */}
           <div className="flex gap-2 pt-1">
             <Link
-              href="/login"
+              href="/signIn"
               onClick={() => setMenuOpen(false)}
               className="flex-1 text-center px-4 py-2 rounded-lg text-sm font-medium text-[#814f30] border border-[#814f30] hover:bg-[#814f30] hover:text-white transition-all"
             >
               Log in
             </Link>
             <Link
-              href="/register"
+              href="/signUp"
               onClick={() => setMenuOpen(false)}
               className="flex-1 text-center px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#814f30] hover:bg-[#6b3f24] transition-all"
             >
