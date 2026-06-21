@@ -13,6 +13,7 @@ import {
 } from "@heroui/react";
 import { createLawyerProfile } from "@/lib/action/createLawyerProfile";
 import { selectRole } from "@/lib/action/userRole";
+import { authClient } from "@/lib/auth-client";
 
 const SPECIALIZATIONS = [
   "Family Law",
@@ -31,10 +32,15 @@ const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
 const LawyerForm = ({ onSuccess }) => {
   const router = useRouter();
+
+  // ✅ Hooks must live at the top level of the component, not inside handlers
+  const { data: session, isPending: sessionPending } = authClient.useSession();
+
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const [form, setForm] = useState({
     name: "",
@@ -74,28 +80,57 @@ const LawyerForm = ({ onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
-    setUploadingPhoto(true);
-    const photoUrl = await uploadToImgBB(photoFile);
-    setUploadingPhoto(false);
+    // Guard: session not ready yet, or user not logged in
+    if (sessionPending) {
+      setError("Still checking your session, please try again in a moment.");
+      return;
+    }
 
-    setSubmitting(true);
+    const userId = session?.user?.id;
+    if (!userId) {
+      setError("You must be logged in to create a lawyer profile.");
+      return;
+    }
 
-    // Set the role first, then create the lawyer profile
-    await selectRole("lawyer");
-    await createLawyerProfile({
-      photoUrl,
-      name: form.name,
-      specialization: form.specialization,
-      bio: form.bio,
-      fee: Number(form.fee),
-      status: form.status,
-    });
+    if (!photoFile) {
+      setError("Please upload a professional photo.");
+      return;
+    }
 
-    setSubmitting(false);
+    if (!form.specialization) {
+      setError("Please select a specialization.");
+      return;
+    }
 
-    onSuccess?.();
-    router.push("/");
+    try {
+      setUploadingPhoto(true);
+      const photoUrl = await uploadToImgBB(photoFile);
+      setUploadingPhoto(false);
+
+      setSubmitting(true);
+      await selectRole("lawyer");
+
+      await createLawyerProfile({
+        lawyerId: userId,
+        photoUrl,
+        name: form.name,
+        specialization: form.specialization,
+        bio: form.bio,
+        fee: Number(form.fee),
+        status: form.status,
+      });
+
+      onSuccess?.();
+      router.push("/");
+    } catch (err) {
+      console.error("Failed to submit lawyer profile:", err);
+      setError("Something went wrong while saving your profile. Please try again.");
+    } finally {
+      setUploadingPhoto(false);
+      setSubmitting(false);
+    }
   };
 
   const isBusy = uploadingPhoto || submitting;
@@ -104,7 +139,7 @@ const LawyerForm = ({ onSuccess }) => {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* Photo upload */}
       <div className="flex flex-col items-center gap-3">
-        <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-[#27405d] bg-[#1A2E44]">
+        <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-[#2E4868] bg-[#1A2E44]">
           {photoPreview ? (
             <Image
               src={photoPreview}
@@ -117,7 +152,7 @@ const LawyerForm = ({ onSuccess }) => {
             <span className="text-xs text-gray-400">No photo</span>
           )}
         </div>
-        <label className="cursor-pointer text-sm font-medium text-[#d09a75] hover:underline">
+        <label className="cursor-pointer text-sm font-medium text-orange-300 hover:underline">
           {photoFile ? "Change photo" : "Upload professional photo"}
           <input
             type="file"
@@ -135,7 +170,7 @@ const LawyerForm = ({ onSuccess }) => {
           placeholder="e.g. Ayesha Rahman"
           value={form.name}
           onChange={handleChange("name")}
-          className="h-12 w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+          className="h-12 w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
         />
       </TextField>
 
@@ -143,17 +178,17 @@ const LawyerForm = ({ onSuccess }) => {
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-white">Specialization *</label>
         <Dropdown>
-          <Dropdown.Trigger className="h-12 w-full justify-between rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-left text-sm text-white hover:border-[#814F30]/50">
+          <Dropdown.Trigger className="h-12 w-full justify-between rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-left text-sm text-white hover:border-orange-400/50">
             {form.specialization || "Select a specialization"}
             <span className="text-xs text-gray-400">▼</span>
           </Dropdown.Trigger>
-          <Dropdown.Popover className="border border-[#27405d] bg-[#1A2E44]">
+          <Dropdown.Popover className="border border-[#2E4868] bg-[#1A2E44]">
             <Dropdown.Menu>
               {SPECIALIZATIONS.map((spec) => (
                 <Dropdown.Item
                   key={spec}
                   onClick={() => handleSpecializationChange(spec)}
-                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#814F30]/20"
+                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-orange-400/20"
                 >
                   <Label className="cursor-pointer text-white">{spec}</Label>
                 </Dropdown.Item>
@@ -173,7 +208,7 @@ const LawyerForm = ({ onSuccess }) => {
           value={form.bio}
           onChange={handleChange("bio")}
           rows={4}
-          className="w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+          className="w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
         />
       </TextField>
 
@@ -185,7 +220,7 @@ const LawyerForm = ({ onSuccess }) => {
           value={form.fee}
           onChange={handleChange("fee")}
           min={0}
-          className="h-12 w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+          className="h-12 w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
         />
       </TextField>
 
@@ -200,8 +235,8 @@ const LawyerForm = ({ onSuccess }) => {
               onClick={() => setForm((prev) => ({ ...prev, status: value }))}
               className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${
                 form.status === value
-                  ? "border-[#814F30] bg-[#814F30]/20 text-white"
-                  : "border-[#27405d] bg-[#1A2E44] text-gray-400 hover:border-[#814F30]/50"
+                  ? "border-orange-400 bg-orange-400/20 text-white"
+                  : "border-[#2E4868] bg-[#1A2E44] text-gray-400 hover:border-orange-400/50"
               }`}
             >
               {value === "available" ? "Available" : "Busy"}
@@ -210,16 +245,23 @@ const LawyerForm = ({ onSuccess }) => {
         </div>
       </div>
 
+      {/* Error message */}
+      {error && (
+        <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+          {error}
+        </p>
+      )}
+
       <Button
         type="submit"
-        isDisabled={isBusy}
-        className="mt-2 h-12 w-full rounded-xl bg-[#814F30] font-semibold text-white disabled:opacity-50"
+        isDisabled={isBusy || sessionPending}
+        className="mt-2 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white transition-all hover:bg-orange-400 disabled:opacity-50"
       >
         {uploadingPhoto
           ? "Uploading photo..."
           : submitting
-          ? "Saving profile..."
-          : "Submit"}
+            ? "Saving profile..."
+            : "Submit"}
       </Button>
     </form>
   );

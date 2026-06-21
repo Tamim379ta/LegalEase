@@ -12,14 +12,14 @@ import Link from "next/link";
 
 const clientNavItems = [
   { icon: House, label: "Dashboard", href: "/dashboard" },
-  { icon: Briefcase, label: "Hiring History", href: "/dashboard/user/hiring-history" },
-  { icon: Person, label: "Update Profile", href: "/dashboard/user/update-profile" },
-  { icon: File, label: "My Comments", href: "/dashboard/user/comments" },
+  { icon: Briefcase, label: "Hiring History", href: "/dashboard/client/hiring-history" },
+  { icon: Person, label: "Update Profile", href: "/dashboard/client/update-profile" },
+  { icon: File, label: "My Comments", href: "/dashboard/client/comments" },
 ];
 
 const lawyerNavItems = [
   { icon: House, label: "Dashboard", href: "/dashboard" },
-  { icon: Briefcase, label: "Hiring Requests", href: "/dashboard/lawyer/hiring-history" },
+  { icon: Briefcase, label: "Hiring Requests", href: "/dashboard/lawyer/hiring-request" },
   { icon: Gear, label: "Manage Legal Profile", href: "/dashboard/lawyer/manage-legal-profile" },
 ];
 
