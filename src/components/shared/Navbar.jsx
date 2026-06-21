@@ -22,13 +22,13 @@ const Navbar = () => {
   if (isPending) return null;
 
   const user = session?.user;
+  const userRole = user?.role
 
-  // ✅ dynamic nav links
   const dynamicNavLinks = user
     ? [
         { label: "Home", href: "/" },
         { label: "Browse Lawyers", href: "/lawyers" },
-        { label: "Dashboard", href: "/dashboard" },
+        { label: "Dashboard", href: `/dashboard/${userRole}` },
       ]
     : navLinks;
 

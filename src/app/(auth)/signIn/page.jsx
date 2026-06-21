@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState } from "react"
 import Link from "next/link";
 import { Form, Button, TextField, Label, Input, FieldError } from "@heroui/react";
 import { FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { authClient } from "@/lib/auth-client";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 
 const SignInPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
+  const router = useRouter()
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -28,6 +29,7 @@ const SignInPage = () => {
 
     if (data) {
       toast.success("Login successful");
+      router.push('/')
     }
     else {
       toast.error("Something went wrong");

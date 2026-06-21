@@ -2,22 +2,28 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@heroui/react";
+import { Button, Modal } from "@heroui/react";
 import { FaUserTie, FaUser } from "react-icons/fa";
 import { selectRole } from "@/lib/action/userRole";
+import LawyerForm from "./../../components/lawyer/LawyerForm";
 
 const ChooseRolePage = () => {
   const router = useRouter();
   const [selected, setSelected] = useState(null);
+  const [lawyerModalOpen, setLawyerModalOpen] = useState(false);
+
+  const handleSelectLawyer = () => {
+    setSelected("lawyer");
+    setLawyerModalOpen(true);
+  };
 
   const handleContinue = async () => {
- 
-    if (!selected) return;
+    if (!selected || selected === "lawyer") return;
+
     const updateRole = await selectRole(selected);
-    if (updateRole){
+    if (updateRole) {
       router.push("/");
     }
-   
   };
 
   return (
@@ -34,10 +40,11 @@ const ChooseRolePage = () => {
           <button
             type="button"
             onClick={() => setSelected("client")}
-            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "client"
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${
+              selected === "client"
                 ? "border-[#814f30] bg-[#814f30]/20"
                 : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
-              }`}
+            }`}
           >
             <FaUser className="text-xl text-[#d09a75]" />
             <div>
@@ -47,11 +54,12 @@ const ChooseRolePage = () => {
 
           <button
             type="button"
-            onClick={() => setSelected("lawyer")}
-            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "lawyer"
+            onClick={handleSelectLawyer}
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${
+              selected === "lawyer"
                 ? "border-[#814f30] bg-[#814f30]/20"
                 : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
-              }`}
+            }`}
           >
             <FaUserTie className="text-xl text-[#d09a75]" />
             <div>
@@ -60,15 +68,36 @@ const ChooseRolePage = () => {
           </button>
         </div>
 
-       
-        <Button
-          isDisabled={!selected}
-          onPress={handleContinue}
-          className="mt-6 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white disabled:opacity-50"
-        >
-          Continue
-        </Button>
+        {selected !== "lawyer" && (
+          <Button
+            isDisabled={!selected}
+            onPress={handleContinue}
+            className="mt-6 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white disabled:opacity-50"
+          >
+            Continue
+          </Button>
+        )}
       </div>
+
+      {/* Controlled modal: opens when the Lawyer card is selected */}
+      <Modal isOpen={lawyerModalOpen} onOpenChange={setLawyerModalOpen}>
+        <Modal.Backdrop>
+          <Modal.Container placement="auto">
+            <Modal.Dialog className="sm:max-w-md">
+              <Modal.CloseTrigger />
+              <Modal.Header>
+                <Modal.Heading>Lawyer Profile</Modal.Heading>
+                <p className="mt-1.5 text-sm leading-5 text-muted">
+                  Tell us about your practice so clients can find and hire you.
+                </p>
+              </Modal.Header>
+              <Modal.Body className="p-6">
+                <LawyerForm onSuccess={() => setLawyerModalOpen(false)} />
+              </Modal.Body>
+            </Modal.Dialog>
+          </Modal.Container>
+        </Modal.Backdrop>
+      </Modal>
     </div>
   );
 };
