@@ -2,8 +2,17 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Dropdown, Button, Label, Input, TextArea } from "@heroui/react";
+import { useRouter } from "next/navigation";
+import {
+  Dropdown,
+  Button,
+  Label,
+  TextField,
+  Input,
+  TextArea,
+} from "@heroui/react";
 import { createLawyerProfile } from "@/lib/action/createLawyerProfile";
+import { selectRole } from "@/lib/action/userRole";
 
 const SPECIALIZATIONS = [
   "Family Law",
@@ -21,11 +30,11 @@ const SPECIALIZATIONS = [
 const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 
 const LawyerForm = ({ onSuccess }) => {
+  const router = useRouter();
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   const [form, setForm] = useState({
     name: "",
@@ -48,7 +57,6 @@ const LawyerForm = ({ onSuccess }) => {
     if (!file) return;
     setPhotoFile(file);
     setPhotoPreview(URL.createObjectURL(file));
-    setError("");
   };
 
   const uploadToImgBB = async (file) => {
@@ -61,51 +69,33 @@ const LawyerForm = ({ onSuccess }) => {
     );
 
     const data = await res.json();
-    if (!data.success) {
-      throw new Error("Image upload failed");
-    }
     return data.data.url;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (!photoFile) {
-      setError("Please upload a professional photo.");
-      return;
-    }
-    if (!form.name || !form.specialization || !form.bio || !form.fee) {
-      setError("Please fill in all fields.");
-      return;
-    }
+    setUploadingPhoto(true);
+    const photoUrl = await uploadToImgBB(photoFile);
+    setUploadingPhoto(false);
 
-    try {
-      setUploadingPhoto(true);
-      const photoUrl = await uploadToImgBB(photoFile);
-      setUploadingPhoto(false);
+    setSubmitting(true);
 
-      setSubmitting(true);
-      const result = await createLawyerProfile({
-        photoUrl,
-        name: form.name,
-        specialization: form.specialization,
-        bio: form.bio,
-        fee: Number(form.fee),
-        status: form.status,
-      });
+    // Set the role first, then create the lawyer profile
+    await selectRole("lawyer");
+    await createLawyerProfile({
+      photoUrl,
+      name: form.name,
+      specialization: form.specialization,
+      bio: form.bio,
+      fee: Number(form.fee),
+      status: form.status,
+    });
 
-      if (result?.success) {
-        onSuccess?.();
-      } else {
-        setError(result?.message || "Something went wrong. Please try again.");
-      }
-    } catch (err) {
-      setError(err.message || "Something went wrong. Please try again.");
-    } finally {
-      setUploadingPhoto(false);
-      setSubmitting(false);
-    }
+    setSubmitting(false);
+
+    onSuccess?.();
+    router.push("/");
   };
 
   const isBusy = uploadingPhoto || submitting;
@@ -114,7 +104,7 @@ const LawyerForm = ({ onSuccess }) => {
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {/* Photo upload */}
       <div className="flex flex-col items-center gap-3">
-        <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-[#27405d] bg-[#102235]/60">
+        <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-[#27405d] bg-[#1A2E44]">
           {photoPreview ? (
             <Image
               src={photoPreview}
@@ -139,34 +129,31 @@ const LawyerForm = ({ onSuccess }) => {
       </div>
 
       {/* Name */}
-      <Input
-        label="Full Name"
-        placeholder="e.g. Ayesha Rahman"
-        value={form.name}
-        onChange={handleChange("name")}
-        isRequired
-        classNames={{ inputWrapper: "bg-[#102235]/60 border-[#27405d]" }}
-      />
+      <TextField name="name" isRequired className="flex flex-col gap-1.5">
+        <Label className="text-sm font-medium text-white">Full Name</Label>
+        <Input
+          placeholder="e.g. Ayesha Rahman"
+          value={form.name}
+          onChange={handleChange("name")}
+          className="h-12 w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+        />
+      </TextField>
 
-      {/* Specialization (HeroUI Dropdown implementation) */}
+      {/* Specialization */}
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium text-white">Specialization *</label>
         <Dropdown>
-          <Dropdown.Trigger>
-            <Button 
-              className="h-12 w-full justify-between rounded-xl border border-[#27405d] bg-[#102235]/60 px-3 text-left text-sm text-white hover:border-[#814f30]/50"
-            >
-              {form.specialization || "Select a specialization"}
-              <span className="text-xs text-gray-400">▼</span>
-            </Button>
+          <Dropdown.Trigger className="h-12 w-full justify-between rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-left text-sm text-white hover:border-[#814F30]/50">
+            {form.specialization || "Select a specialization"}
+            <span className="text-xs text-gray-400">▼</span>
           </Dropdown.Trigger>
-          <Dropdown.Popover className="border border-[#27405d] bg-[#102235]">
+          <Dropdown.Popover className="border border-[#27405d] bg-[#1A2E44]">
             <Dropdown.Menu>
               {SPECIALIZATIONS.map((spec) => (
-                <Dropdown.Item 
-                  key={spec} 
+                <Dropdown.Item
+                  key={spec}
                   onClick={() => handleSpecializationChange(spec)}
-                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#814f30]/20"
+                  className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#814F30]/20"
                 >
                   <Label className="cursor-pointer text-white">{spec}</Label>
                 </Dropdown.Item>
@@ -177,28 +164,30 @@ const LawyerForm = ({ onSuccess }) => {
       </div>
 
       {/* Bio */}
-      <TextArea
-        label="Bio / Professional Summary"
-        placeholder="Briefly describe your experience and expertise..."
-        value={form.bio}
-        onChange={handleChange("bio")}
-        minRows={4}
-        isRequired
-        classNames={{ inputWrapper: "bg-[#102235]/60 border-[#27405d]" }}
-      />
+      <TextField name="bio" isRequired className="flex flex-col gap-1.5">
+        <Label className="text-sm font-medium text-white">
+          Bio / Professional Summary
+        </Label>
+        <TextArea
+          placeholder="Briefly describe your experience and expertise..."
+          value={form.bio}
+          onChange={handleChange("bio")}
+          rows={4}
+          className="w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+        />
+      </TextField>
 
       {/* Fee */}
-      <Input
-        type="number"
-        label="Consultation Fee"
-        placeholder="e.g. 2000"
-        value={form.fee}
-        onChange={handleChange("fee")}
-        isRequired
-        min={0}
-        startContent={<span className="text-gray-400">৳</span>}
-        classNames={{ inputWrapper: "bg-[#102235]/60 border-[#27405d]" }}
-      />
+      <TextField name="fee" type="number" isRequired className="flex flex-col gap-1.5">
+        <Label className="text-sm font-medium text-white">Consultation Fee</Label>
+        <Input
+          placeholder="e.g. 2000"
+          value={form.fee}
+          onChange={handleChange("fee")}
+          min={0}
+          className="h-12 w-full rounded-xl border border-[#27405d] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814F30] focus:outline-none"
+        />
+      </TextField>
 
       {/* Status */}
       <div className="flex flex-col gap-1.5">
@@ -209,10 +198,11 @@ const LawyerForm = ({ onSuccess }) => {
               key={value}
               type="button"
               onClick={() => setForm((prev) => ({ ...prev, status: value }))}
-              className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${form.status === value
-                  ? "border-[#814f30] bg-[#814f30]/20 text-white"
-                  : "border-[#27405d] bg-[#102235]/60 text-gray-400 hover:border-[#814f30]/50"
-                }`}
+              className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${
+                form.status === value
+                  ? "border-[#814F30] bg-[#814F30]/20 text-white"
+                  : "border-[#27405d] bg-[#1A2E44] text-gray-400 hover:border-[#814F30]/50"
+              }`}
             >
               {value === "available" ? "Available" : "Busy"}
             </button>
@@ -220,18 +210,16 @@ const LawyerForm = ({ onSuccess }) => {
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-400">{error}</p>}
-
       <Button
         type="submit"
         isDisabled={isBusy}
-        className="mt-2 h-12 w-full rounded-xl bg-[#814f30] font-semibold text-white disabled:opacity-50"
+        className="mt-2 h-12 w-full rounded-xl bg-[#814F30] font-semibold text-white disabled:opacity-50"
       >
         {uploadingPhoto
           ? "Uploading photo..."
           : submitting
-            ? "Saving profile..."
-            : "Submit"}
+          ? "Saving profile..."
+          : "Submit"}
       </Button>
     </form>
   );
