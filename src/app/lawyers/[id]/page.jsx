@@ -1,13 +1,16 @@
 import BookingBtn from "@/components/lawyer/BookingBtn";
 import { getAllLawyers } from "@/lib/api/lawyers";
+import { services } from "@/lib/api/services";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
 const LawyerDetailsPage = async ({ params }) => {
   const { id } = await params;
-
+  const allServices = await services();
   const lawyers = await getAllLawyers();
+
+  // Find the lawyer based on the parameter ID matching string values safely
   const lawyer = lawyers.find(
     (l) => (l._id?.$oid || l._id) === id
   );
@@ -27,8 +30,12 @@ const LawyerDetailsPage = async ({ params }) => {
     );
   }
 
+  // Extract raw custom ID safely to link and match collections records correctly
+  const currentLawyerId = lawyer.lawyerId || lawyer._id?.$oid || lawyer._id;
+  const serviceFilter = allServices?.filter(s => s.lawyerId === currentLawyerId) || [];
+
   const { photoUrl, name, specialization, bio, fee, status } = lawyer;
-  
+
   return (
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
       <Link
@@ -49,6 +56,7 @@ const LawyerDetailsPage = async ({ params }) => {
                 fill
                 priority
                 className="object-cover"
+                unoptimized
               />
             ) : (
               <div className="flex h-full items-center justify-center text-sm font-medium uppercase tracking-wider text-gray-500">
@@ -62,23 +70,26 @@ const LawyerDetailsPage = async ({ params }) => {
             <div className="flex flex-col gap-4">
               <div>
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Consultation Fee</span>
-                <p className="mt-1 text-2xl font-bold text-white">৳{fee}</p>
+                <p className="mt-1 text-2xl font-bold text-white">
+                  ৳{fee ? fee.toLocaleString() : "0"}
+                </p>
               </div>
 
               <div className="flex items-center justify-between border-t border-[#27405d]/50 pt-4">
                 <span className="text-sm text-gray-400">Availability Status</span>
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide backdrop-blur-md ${status === "available"
-                    ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30"
-                    : "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/30"
-                    }`}
+                  className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold uppercase tracking-wide backdrop-blur-md ${
+                    status === "available"
+                      ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/30"
+                      : "bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/30"
+                  }`}
                 >
                   <span className={`h-1.5 w-1.5 rounded-full ${status === "available" ? "bg-emerald-400" : "bg-rose-400"}`} />
                   {status}
                 </span>
               </div>
 
-             <BookingBtn lawyer={lawyer}/>
+              <BookingBtn lawyer={lawyer} />
             </div>
           </div>
         </div>
@@ -86,9 +97,23 @@ const LawyerDetailsPage = async ({ params }) => {
         {/* Right Column: Detailed Bio & Info */}
         <div className="md:col-span-2 flex flex-col gap-6 rounded-2xl border border-[#27405d] bg-[#1A2E44] p-6 sm:p-8">
           <div>
-            <span className="rounded-md border border-[#814F30]/30 bg-[#814F30]/10 px-3 py-1 text-xs font-semibold text-[#d09a75] tracking-wide uppercase">
-              {specialization}
-            </span>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {/* Fallback Check: Loop services if present, else show lawyer profile root specialization */}
+              {serviceFilter.length > 0 ? (
+                serviceFilter.map((item) => (
+                  <span
+                    key={item._id?.$oid || item._id}
+                    className="rounded-md border border-[#814F30]/30 bg-[#814F30]/10 px-2.5 py-0.5 text-xs font-medium text-[#d09a75] tracking-wide"
+                  >
+                    {item.specialization}
+                  </span>
+                ))
+              ) : (
+                <span className="rounded-md border border-[#814F30]/30 bg-[#814F30]/10 px-2.5 py-0.5 text-xs font-medium text-[#d09a75] tracking-wide">
+                  {specialization || "General Practice"}
+                </span>
+              )}
+            </div>
             <h1 className="mt-3 text-3xl font-bold tracking-tight text-white sm:text-4xl">
               Advocate {name}
             </h1>
@@ -97,7 +122,7 @@ const LawyerDetailsPage = async ({ params }) => {
           <div className="border-t border-[#27405d]/50 pt-6">
             <h2 className="text-lg font-semibold text-white">Professional Biography</h2>
             <p className="mt-3 text-base leading-relaxed text-gray-300 whitespace-pre-line">
-              {bio}
+              {bio || "No biography provided yet."}
             </p>
           </div>
 

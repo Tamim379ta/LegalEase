@@ -33,7 +33,6 @@ const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
 const LawyerForm = ({ onSuccess }) => {
   const router = useRouter();
 
-  // ✅ Hooks must live at the top level of the component, not inside handlers
   const { data: session, isPending: sessionPending } = authClient.useSession();
 
   const [photoFile, setPhotoFile] = useState(null);

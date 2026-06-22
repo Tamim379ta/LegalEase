@@ -19,7 +19,6 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
 
-  if (isPending) return null;
 
   const user = session?.user;
   const userRole = user?.role

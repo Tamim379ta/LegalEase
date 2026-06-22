@@ -11,3 +11,9 @@ export const getLawyerById = async () => {
   const userId = user?.id
   return await serverFetch(`/lawyers/${userId}`)
 }
+
+export const serviceById = async () => {
+  const user = await getUserSession()
+  const userId = user?.id
+  return await serverFetch(`/services/lawyers/${userId}`)
+}
