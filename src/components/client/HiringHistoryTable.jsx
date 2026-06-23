@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Table, Button } from "@heroui/react";
+import { getUserSession } from "@/lib/core/session";
 
 const statusStyles = {
   accepted: {
@@ -29,10 +30,27 @@ const HiringHistoryTable = ({ initialHistory = [] }) => {
     });
   };
 
-  const handlePayment = (hiringId) => {
-    console.log("Proceeding to payment for:", hiringId);
-  };
+  const handlePayment = async (row) => {
+    const lawyerId = row.lawyerId
+    const hiringId = row._id
+    const session = await getUserSession()
 
+    const res = await fetch('/api/checkout_sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        lawyerName: row.lawyerName,
+        hourlyRate: row.fee,
+        lawyerId,
+        hiringId,
+        clientId: session?.id,      
+        clientEmail: session?.email, 
+      }),
+    })
+
+    const { url } = await res.json()
+    window.location.href = url
+  }
   return (
     <div className="overflow-hidden rounded-2xl border border-[#1A2E44]">
       <Table className="w-full text-left text-sm text-black" aria-label="Hiring History">
@@ -60,29 +78,24 @@ const HiringHistoryTable = ({ initialHistory = [] }) => {
                     key={hiringId}
                     className="border-b border-[#1A2E44]/40"
                   >
-                    {/* Lawyer */}
                     <Table.Cell isRowHeader className="p-4 font-semibold text-black">
                       Advocate {row.lawyerName}
                     </Table.Cell>
 
-                    {/* Specialization */}
                     <Table.Cell className="p-4">
                       <span className="inline-block rounded-md border border-[#1A2E44] px-2.5 py-1 text-xs text-black">
                         {row.specialization}
                       </span>
                     </Table.Cell>
 
-                    {/* Fee */}
                     <Table.Cell className="p-4 font-semibold text-black">
                       ৳{row.fee ? row.fee.toLocaleString() : "0"}
                     </Table.Cell>
 
-                    {/* Date */}
                     <Table.Cell className="p-4 text-black/70">
                       {formatDate(row.createdAt?.$date || row.createdAt)}
                     </Table.Cell>
 
-                    {/* Status */}
                     <Table.Cell className="p-4">
                       <span
                         className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${styles.badge}`}
@@ -94,18 +107,20 @@ const HiringHistoryTable = ({ initialHistory = [] }) => {
 
                     {/* Action */}
                     <Table.Cell className="p-4 text-right">
-                      {status === "accepted" ? (
-                        <Button
-                          onClick={() => handlePayment(hiringId)}
+                      {status === "accepted" && row.haringStatus !== "paid" ? (
+                        <button
+                          onClick={() => handlePayment(row)}
                           className="h-8 rounded-lg border border-[#1A2E44] px-3 text-xs font-semibold text-black hover:bg-gray-100"
                         >
                           Pay Now
-                        </Button>
+                        </button>
+                      ) : status === "accepted" && row.haringStatus === "paid" ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-green-500/40 px-3 py-1 text-xs font-semibold text-green-700">
+                          <span className="h-1.5 w-1.5 rounded-full bg-green-600" />
+                          Paid
+                        </span>
                       ) : (
-                        <Button
-                          isDisabled
-                          className="h-8 rounded-lg border border-[#1A2E44]/40 px-3 text-xs text-black/40"
-                        >
+                        <Button isDisabled className="h-8 rounded-lg border border-[#1A2E44]/40 px-3 text-xs text-black/40">
                           {status === "rejected" ? "Unavailable" : "Locked"}
                         </Button>
                       )}
@@ -119,7 +134,6 @@ const HiringHistoryTable = ({ initialHistory = [] }) => {
         <Table.Footer />
       </Table>
 
-      {/* Empty state fallback display */}
       {initialHistory.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-black/60">
           <p className="text-sm">No hiring history found.</p>

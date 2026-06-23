@@ -1,3 +1,4 @@
+'use server'
 import { serverFetch } from "../core/server"
 
 export const services = async() => {

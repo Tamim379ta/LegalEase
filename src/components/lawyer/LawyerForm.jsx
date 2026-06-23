@@ -12,8 +12,8 @@ import {
   TextArea,
 } from "@heroui/react";
 import { createLawyerProfile } from "@/lib/action/createLawyerProfile";
-import { selectRole } from "@/lib/action/userRole";
 import { authClient } from "@/lib/auth-client";
+import { updateUserProfile } from "@/lib/action/userRole";
 
 const SPECIALIZATIONS = [
   "Family Law",
@@ -109,7 +109,7 @@ const LawyerForm = ({ onSuccess }) => {
       setUploadingPhoto(false);
 
       setSubmitting(true);
-      await selectRole("lawyer");
+      await updateUserProfile({ role: "lawyer"});
 
       await createLawyerProfile({
         lawyerId: userId,

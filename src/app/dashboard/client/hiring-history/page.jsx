@@ -6,18 +6,15 @@ const HiringHistoryPage = async () => {
   const historyData = await bookingListById()
 
   return (
-    <div className="min-h-screen mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold tracking-tight text-black sm:text-3xl">
+    <div className="w-full">
+      <div className="mb-6 border-b border-[#1A2E44]/20 pb-4">
+        <h1 className="text-2xl font-bold tracking-tight text-black">
           Hiring History
         </h1>
-        <p className="mt-2 text-sm text-black/70">
+        <p className="mt-1 text-sm text-black/60">
           Track your consulting requests, check statuses, and finalize payments.
         </p>
       </div>
-
-      {/* Interactive Table Client Component */}
       <HiringHistoryTable initialHistory={historyData} />
     </div>
   );

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Modal } from "@heroui/react";
 import { FaUserTie, FaUser } from "react-icons/fa";
-import { selectRole } from "@/lib/action/userRole";
 import LawyerForm from "./../../components/lawyer/LawyerForm";
+import { updateUserProfile } from "@/lib/action/userRole";
 
 const ChooseRolePage = () => {
   const router = useRouter();
@@ -20,7 +20,7 @@ const ChooseRolePage = () => {
   const handleContinue = async () => {
     if (!selected || selected === "lawyer") return;
 
-    const updateRole = await selectRole(selected);
+    const updateRole = await updateUserProfile({role: selected});
     if (updateRole) {
       router.push("/");
     }

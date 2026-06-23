@@ -6,23 +6,31 @@ import {
   Gear,
   House,
   Person,
+  Persons,
+  CreditCard,
+  ChartMixed
 } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
 
 const clientNavItems = [
-  { icon: House, label: "Dashboard", href: "/dashboard" },
+  { icon: House, label: "Dashboard", href: "/dashboard/client" },
   { icon: Briefcase, label: "Hiring History", href: "/dashboard/client/hiring-history" },
   { icon: Person, label: "Update Profile", href: "/dashboard/client/update-profile" },
   { icon: File, label: "My Comments", href: "/dashboard/client/comments" },
 ];
 
 const lawyerNavItems = [
-  { icon: House, label: "Dashboard", href: "/dashboard" },
+  { icon: House, label: "Dashboard", href: "/dashboard/lawyer" },
   { icon: Briefcase, label: "Hiring Requests", href: "/dashboard/lawyer/hiring-request" },
   { icon: Gear, label: "Manage Legal Profile", href: "/dashboard/lawyer/manage-legal-profile" },
 ];
-
+const adminNavItems = [
+  { icon: House, label: "Dashboard", href: "/dashboard/admin" },
+  { icon: Persons, label: "Manage Users", href: "/dashboard/admin/manage-users" },
+  { icon: CreditCard, label: "All Transactions", href: "/dashboard/admin/all-transactions" },
+  { icon: ChartMixed, label: "Analytics Overview", href: "/dashboard/admin/analytics" },
+];
 function NavLinks({ items }) {
   return (
     <nav className="flex flex-col gap-1">
@@ -44,8 +52,11 @@ export async function DashboardSidebar() {
   const user = await getUserSession();
   const userRole = user?.role;
 
-  const navItems = userRole === "lawyer" ? lawyerNavItems : clientNavItems;
-
+  const navItems = userRole === "lawyer"
+    ? lawyerNavItems
+    : userRole === "admin"
+      ? adminNavItems
+      : clientNavItems;
   return (
     <>
       {/* Desktop: always-visible static sidebar */}

@@ -7,21 +7,26 @@ import { useRouter } from "next/navigation";
 
 const statusStyles = {
   accepted: {
-    badge: "text-green-700 border-green-500/40",
+    badge: "text-green-700 border-green-500/40 bg-green-500/5",
     dot: "bg-green-600",
   },
+  paid: {
+    badge: "text-blue-700 border-blue-500/40 bg-blue-500/5",
+    dot: "bg-blue-600",
+  },
   rejected: {
-    badge: "text-red-700 border-red-500/40",
+    badge: "text-red-700 border-red-500/40 bg-red-500/5",
     dot: "bg-red-600",
   },
   pending: {
-    badge: "text-yellow-700 border-yellow-500/40",
+    badge: "text-yellow-700 border-yellow-500/40 bg-yellow-500/5",
     dot: "bg-yellow-600",
   },
 };
 
 const HiringRequestTable = ({ initialRequests = [] }) => {
-  const router = useRouter()
+  const router = useRouter();
+  
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
     const date = new Date(dateString);
@@ -33,24 +38,22 @@ const HiringRequestTable = ({ initialRequests = [] }) => {
   };
 
   const handleAccept = async (requestId) => {
-    const accepted = await handleRequest(requestId, { haringStatus: "accepted" })
-    router.refresh()
+    await handleRequest(requestId, { haringStatus: "accepted" });
+    router.refresh();
   };
 
   const handleReject = async (requestId) => {
-    const rejected = await handleRequest(requestId, { haringStatus: "rejected" })
-    router.refresh()
+    await handleRequest(requestId, { haringStatus: "rejected" });
+    router.refresh();
   };
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#1A2E44]">
+    <div className="overflow-hidden rounded-2xl border border-[#1A2E44] bg-white">
       <Table className="w-full text-left text-sm text-black" aria-label="Hiring Requests">
         <Table.ScrollContainer>
           <Table.Content aria-label="Hiring Requests Table">
             <Table.Header className="border-b border-[#1A2E44] text-xs font-bold uppercase tracking-wider text-black">
-              <Table.Column className="p-4" isRowHeader>
-                Client Name
-              </Table.Column>
+              <Table.Column className="p-4" isRowHeader>Client Name</Table.Column>
               <Table.Column className="p-4">Specialization</Table.Column>
               <Table.Column className="p-4">Fee</Table.Column>
               <Table.Column className="p-4">Request Date</Table.Column>
@@ -65,10 +68,7 @@ const HiringRequestTable = ({ initialRequests = [] }) => {
                 const styles = statusStyles[status] || statusStyles.pending;
 
                 return (
-                  <Table.Row
-                    key={requestId}
-                    className="border-b border-[#1A2E44]/40"
-                  >
+                  <Table.Row key={requestId} className="border-b border-[#1A2E44]/40 hover:bg-gray-50/50 transition-colors">
                     {/* Client Name */}
                     <Table.Cell isRowHeader className="p-4 font-semibold text-black">
                       {row.userName}
@@ -93,15 +93,13 @@ const HiringRequestTable = ({ initialRequests = [] }) => {
 
                     {/* Status Badge */}
                     <Table.Cell className="p-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${styles.badge}`}
-                      >
+                      <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold capitalize ${styles.badge}`}>
                         <span className={`h-1.5 w-1.5 rounded-full ${styles.dot}`} />
                         {status}
                       </span>
                     </Table.Cell>
 
-                    {/* Action Buttons */}
+                    {/* Action Buttons Handler */}
                     <Table.Cell className="p-4 text-right">
                       {status === "pending" ? (
                         <div className="flex items-center justify-end gap-2">
@@ -121,9 +119,13 @@ const HiringRequestTable = ({ initialRequests = [] }) => {
                       ) : (
                         <Button
                           isDisabled
-                          className="h-8 rounded-lg border border-[#1A2E44]/40 px-3 text-xs text-black/40"
+                          className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors
+                            ${status === "paid" 
+                              ? "border-blue-200 bg-blue-50/50 text-blue-500" 
+                              : "border-[#1A2E44]/40 text-black/40"
+                            }`}
                         >
-                          {status === "accepted" ? "Accepted" : "Rejected"}
+                          {status === "paid" ? "Paid" : status === "accepted" ? "Accepted" : "Rejected"}
                         </Button>
                       )}
                     </Table.Cell>
@@ -138,7 +140,7 @@ const HiringRequestTable = ({ initialRequests = [] }) => {
 
       {/* Empty state fallback display */}
       {initialRequests.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-black/60">
+        <div className="flex flex-col items-center justify-center py-16 text-black/60 bg-white">
           <p className="text-sm">No hiring requests found.</p>
         </div>
       )}
