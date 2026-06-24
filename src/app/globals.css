@@ -1,3 +1,24 @@
 @import "tailwindcss";
 @import "@heroui/styles"; 
 
+
+@theme {
+  --animate-fade-in-up: fade-in-up 0.7s ease forwards;
+  --animate-float: float 4s ease-in-out infinite;
+  --animate-float-reverse: float-reverse 4.5s ease-in-out infinite;
+
+  @keyframes fade-in-up {
+    0%   { opacity: 0; transform: translateY(28px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50%       { transform: translateY(-14px) rotate(4deg); }
+  }
+
+  @keyframes float-reverse {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50%       { transform: translateY(-12px) rotate(-5deg); }
+  }
+}

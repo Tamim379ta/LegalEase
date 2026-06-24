@@ -6,6 +6,10 @@ export const getAllLawyers = async () => {
   return serverFetch('/lawyers')
 }
 
+export const featuredlawyers = async () => {
+  return await serverFetch('/featuredlawyers');
+}
+
 export const getLawyerById = async () => {
   const user = await getUserSession()
   const userId = user?.id
