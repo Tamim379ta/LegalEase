@@ -44,7 +44,7 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <Image 
-            className="rounded-2xl mb-3"
+            className="rounded-xl mb-3"
             src={'/assets/footerlogo.png'}
             alt="Logo"
             width={230}

@@ -1,5 +1,4 @@
-import { getAllLawyers } from '@/lib/api/lawyers';
-import { deleteLawyer } from '@/lib/action/editLawyer';
+import { manageLawyers } from '@/lib/api/lawyers';
 import { Table } from '@heroui/react';
 import Image from 'next/image';
 import { FaUserCircle } from 'react-icons/fa';
@@ -11,7 +10,7 @@ const statusStyles = {
 };
 
 const ManageLawyersPage = async () => {
-  const lawyers = await getAllLawyers();
+  const lawyers = await manageLawyers();
   const hasLawyers = lawyers && lawyers.length > 0;
 
   return (

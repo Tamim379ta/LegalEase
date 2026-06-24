@@ -1,75 +1,27 @@
 import { getUserSession } from "@/lib/core/session";
-import {
-  Bars,
-  Briefcase,
-  File,
-  Gear,
-  House,
-  Person,
-  Persons,
-  CreditCard,
-  ChartMixed,
-  PersonPencil
-} from "@gravity-ui/icons";
+import { Bars } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
-import Link from "next/link";
-
-const clientNavItems = [
-  { icon: House, label: "Dashboard", href: "/dashboard/client" },
-  { icon: Briefcase, label: "Hiring History", href: "/dashboard/client/hiring-history" },
-  { icon: Person, label: "Update Profile", href: "/dashboard/client/update-profile" },
-  { icon: File, label: "My Comments", href: "/dashboard/client/comments" },
-];
-
-const lawyerNavItems = [
-  { icon: House, label: "Dashboard", href: "/dashboard/lawyer" },
-  { icon: Briefcase, label: "Hiring Requests", href: "/dashboard/lawyer/hiring-request" },
-  { icon: Gear, label: "Manage Legal Profile", href: "/dashboard/lawyer/manage-legal-profile" },
-];
-const adminNavItems = [
-  { icon: House, label: "Dashboard", href: "/dashboard/admin" },
-  { icon: Persons, label: "Manage Users", href: "/dashboard/admin/manage-users" },
-  { icon: PersonPencil, label: "Manage Lawyers", href: "/dashboard/admin/manage-lawyers" },
-  { icon: CreditCard, label: "All Transactions", href: "/dashboard/admin/all-transactions" },
-  { icon: ChartMixed, label: "Analytics Overview", href: "/dashboard/admin/analytics" },
-];
-function NavLinks({ items }) {
-  return (
-    <nav className="flex flex-col gap-1">
-      {items.map((item) => (
-        <Link
-          key={item.label}
-          href={item.href}
-          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground transition-colors hover:bg-default"
-        >
-          <item.icon className="size-5 text-muted" />
-          {item.label}
-        </Link>
-      ))}
-    </nav>
-  );
-}
+import { ActiveNavLinks } from "./ActiveNavLinks";
 
 export async function DashboardSidebar() {
   const user = await getUserSession();
   const userRole = user?.role;
 
-  const navItems = userRole === "lawyer"
-    ? lawyerNavItems
-    : userRole === "admin"
-      ? adminNavItems
-      : clientNavItems;
   return (
     <>
-      {/* Desktop: always-visible static sidebar */}
-      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-default md:p-4">
-        <NavLinks items={navItems} />
+      {/* Desktop sidebar */}
+      <aside className="hidden md:flex md:w-64 md:flex-col md:border-r md:border-default md:p-4 gap-4">
+        <div className="px-3 py-3 rounded-xl bg-default mb-2">
+          <p className="text-sm font-semibold text-foreground truncate">{user?.name || "User"}</p>
+          <p className="text-xs text-muted capitalize">{userRole}</p>
+        </div>
+        <ActiveNavLinks role={userRole} />
       </aside>
 
-      {/* Mobile: drawer behind a menu button */}
-      <div className="md:hidden">
+      {/* Mobile sticky bar with drawer */}
+      <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-default bg-white sticky top-[68px] z-40">
         <Drawer>
-          <Button variant="secondary">
+          <Button variant="secondary" size="sm">
             <Bars />
             Menu
           </Button>
@@ -77,13 +29,20 @@ export async function DashboardSidebar() {
             <Drawer.Content placement="left">
               <Drawer.Dialog>
                 <Drawer.CloseTrigger />
-                <Drawer.Body>
-                  <NavLinks items={navItems} />
+                <Drawer.Body className="pt-4">
+                  <div className="px-3 py-3 rounded-xl bg-default mb-4">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {user?.name || "User"}
+                    </p>
+                    <p className="text-xs text-muted capitalize">{userRole}</p>
+                  </div>
+                  <ActiveNavLinks role={userRole} />
                 </Drawer.Body>
               </Drawer.Dialog>
             </Drawer.Content>
           </Drawer.Backdrop>
         </Drawer>
+        <span className="text-sm font-medium text-slate-500">Dashboard</span>
       </div>
     </>
   );

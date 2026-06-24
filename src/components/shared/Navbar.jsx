@@ -3,8 +3,8 @@
 import { authClient } from "@/lib/auth-client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useState, useCallback, useRef } from "react";
 import { FiSearch, FiMenu, FiX } from "react-icons/fi";
 
 const navLinks = [
@@ -14,14 +14,14 @@ const navLinks = [
 
 const Navbar = () => {
   const { data: session, isPending } = authClient.useSession();
-
   const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [search, setSearch] = useState("");
-
+  const debounceRef = useRef(null);
 
   const user = session?.user;
-  const userRole = user?.role
+  const userRole = user?.role;
 
   const dynamicNavLinks = user
     ? [
@@ -30,6 +30,26 @@ const Navbar = () => {
         { label: "Dashboard", href: `/dashboard/${userRole}` },
       ]
     : navLinks;
+
+  const handleSearch = useCallback((value) => {
+    setSearch(value)
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      if (value.trim()) {
+        router.push(`/lawyers?search=${encodeURIComponent(value.trim())}`)
+      } else {
+        router.push('/lawyers')
+      }
+    }, 400)
+  }, [router])
+
+  const handleKeyDown = (e, closeMobile = false) => {
+    if (e.key === 'Enter' && search.trim()) {
+      clearTimeout(debounceRef.current)
+      router.push(`/lawyers?search=${encodeURIComponent(search.trim())}`)
+      if (closeMobile) setMenuOpen(false)
+    }
+  }
 
   return (
     <nav className="bg-white border-b border-[#e8e2d9] sticky top-0 z-50">
@@ -69,7 +89,8 @@ const Navbar = () => {
           <input
             type="text"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearch(e.target.value)}
+            onKeyDown={(e) => handleKeyDown(e)}
             placeholder="Search lawyers, specialties..."
             className="bg-transparent outline-none text-sm text-[#1a2e44] placeholder:text-gray-400 w-full min-w-0"
           />
@@ -82,10 +103,9 @@ const Navbar = () => {
               <span className="text-sm text-slate-600 font-medium whitespace-nowrap max-w-[140px] truncate">
                 Hi, {user.name || "User"}
               </span>
-
               <button
                 onClick={() => authClient.signOut()}
-                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-all "
+                className="px-4 py-2 rounded-lg text-sm font-medium text-white bg-red-500 hover:bg-red-600 transition-all"
               >
                 Logout
               </button>
@@ -98,7 +118,6 @@ const Navbar = () => {
               >
                 Log in
               </Link>
-
               <Link
                 href="/signUp"
                 className="px-4 py-2 rounded-lg text-sm font-semibold text-white bg-[#814f30] hover:bg-[#6b3f24] transition-all whitespace-nowrap"
@@ -129,7 +148,8 @@ const Navbar = () => {
             <input
               type="text"
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, true)}
               placeholder="Search lawyers, specialties..."
               className="bg-transparent outline-none text-sm text-[#1a2e44] placeholder:text-gray-400 w-full"
             />
@@ -160,7 +180,6 @@ const Navbar = () => {
                 <div className="flex-1 text-center px-4 py-2 rounded-lg text-sm font-medium text-slate-600 truncate">
                   Hi, {user.name || "User"}
                 </div>
-
                 <button
                   onClick={() => {
                     authClient.signOut();
@@ -180,7 +199,6 @@ const Navbar = () => {
                 >
                   Log in
                 </Link>
-
                 <Link
                   href="/signUp"
                   onClick={() => setMenuOpen(false)}
