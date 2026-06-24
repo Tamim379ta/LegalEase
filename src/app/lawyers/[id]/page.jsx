@@ -1,19 +1,16 @@
 import BookingBtn from "@/components/lawyer/BookingBtn";
-import { getAllLawyers } from "@/lib/api/lawyers";
+import { getLawyerById } from "@/lib/api/lawyers";
 import { services } from "@/lib/api/services";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 const LawyerDetailsPage = async ({ params }) => {
   const { id } = await params;
-  const allServices = await services();
-  const lawyers = await getAllLawyers();
 
-  // Find the lawyer based on the parameter ID matching string values safely
-  const lawyer = lawyers.find(
-    (l) => (l._id?.$oid || l._id) === id
-  );
+  const [lawyer, allServices] = await Promise.all([
+    getLawyerById(id),
+    services(),
+  ])
 
   if (!lawyer) {
     return (
@@ -30,10 +27,8 @@ const LawyerDetailsPage = async ({ params }) => {
     );
   }
 
-  // Extract raw custom ID safely to link and match collections records correctly
   const currentLawyerId = lawyer.lawyerId || lawyer._id?.$oid || lawyer._id;
   const serviceFilter = allServices?.filter(s => s.lawyerId === currentLawyerId) || [];
-
   const { photoUrl, name, specialization, bio, fee, status } = lawyer;
 
   return (
@@ -65,7 +60,7 @@ const LawyerDetailsPage = async ({ params }) => {
             )}
           </div>
 
-          {/* Action Box card */}
+          {/* Action Box */}
           <div className="rounded-2xl border border-[#27405d] bg-[#1A2E44] p-5">
             <div className="flex flex-col gap-4">
               <div>
@@ -94,11 +89,10 @@ const LawyerDetailsPage = async ({ params }) => {
           </div>
         </div>
 
-        {/* Right Column: Detailed Bio & Info */}
+        {/* Right Column */}
         <div className="md:col-span-2 flex flex-col gap-6 rounded-2xl border border-[#27405d] bg-[#1A2E44] p-6 sm:p-8">
           <div>
             <div className="mt-1.5 flex flex-wrap gap-2">
-              {/* Fallback Check: Loop services if present, else show lawyer profile root specialization */}
               {serviceFilter.length > 0 ? (
                 serviceFilter.map((item) => (
                   <span

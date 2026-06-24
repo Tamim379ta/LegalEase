@@ -23,12 +23,10 @@ export const topLawyers = async () => {
 export const featuredlawyers = async () => {
   return await serverFetch('/featuredlawyers');
 }
-
-export const getLawyerById = async () => {
-  const user = await getUserSession()
-  const userId = user?.id
-  return await serverFetch(`/lawyers/${userId}`)
+export const getLawyerById = async (id) => {
+  return serverFetch(`/lawyers/${id}`)
 }
+
 
 export const serviceById = async () => {
   const user = await getUserSession()
