@@ -72,7 +72,7 @@ const LawyersCard = ({ lawyer, services = [] }) => {
         </div>
 
         {/* Bio Summary */}
-        <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-gray-400">
+        <p className="mt-3 line-clamp-1 text-sm leading-relaxed text-gray-400">
           {bio || "No biography provided yet."}
         </p>
 
@@ -83,7 +83,7 @@ const LawyersCard = ({ lawyer, services = [] }) => {
         <div className="mt-auto flex items-baseline justify-between">
           <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Consultation</span>
           <p className="text-lg font-bold text-white">
-            ৳{fee ? fee.toLocaleString() : "0"} <span className="text-xs font-normal text-gray-400">/ session</span>
+            ${fee ? fee.toLocaleString() : "0"} <span className="text-xs font-normal text-gray-400">/ session</span>
           </p>
         </div>
       </div>

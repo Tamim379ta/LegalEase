@@ -17,3 +17,7 @@ export const editLawyerServices = async (id, data) => {
 export const deleteLawyerServices = async (id) => {
   return await serverMutation(`/services/lawyers/${id}`, {},  "DELETE")
 }
+
+export const deleteLawyer = async (id) => {
+  return await serverMutation(`/lawyers/${id}` , {} , 'DELETE')
+}

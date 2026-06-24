@@ -71,7 +71,7 @@ const LawyerDetailsPage = async ({ params }) => {
               <div>
                 <span className="text-xs font-medium uppercase tracking-wider text-gray-400">Consultation Fee</span>
                 <p className="mt-1 text-2xl font-bold text-white">
-                  ৳{fee ? fee.toLocaleString() : "0"}
+                  ${fee ? fee.toLocaleString() : "0"}
                 </p>
               </div>
 

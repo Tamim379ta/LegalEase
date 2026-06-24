@@ -9,7 +9,7 @@ export const updateUserProfile = async (data) => {
   };
   return await serverMutation(`/users/${targetUserId}`, payload, "PATCH");
 };
-export const deleteUser = async ({userId}) => {
+export const deleteUser = async ({ userId }) => {
 
-  return await serverMutation(`/users/${userId}`, {}, "DELETE" )
+  return await serverMutation(`/users/${userId}`, {}, "DELETE")
 }

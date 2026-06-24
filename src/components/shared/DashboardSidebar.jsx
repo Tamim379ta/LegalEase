@@ -8,7 +8,8 @@ import {
   Person,
   Persons,
   CreditCard,
-  ChartMixed
+  ChartMixed,
+  PersonPencil
 } from "@gravity-ui/icons";
 import { Button, Drawer } from "@heroui/react";
 import Link from "next/link";
@@ -28,6 +29,7 @@ const lawyerNavItems = [
 const adminNavItems = [
   { icon: House, label: "Dashboard", href: "/dashboard/admin" },
   { icon: Persons, label: "Manage Users", href: "/dashboard/admin/manage-users" },
+  { icon: PersonPencil, label: "Manage Lawyers", href: "/dashboard/admin/manage-lawyers" },
   { icon: CreditCard, label: "All Transactions", href: "/dashboard/admin/all-transactions" },
   { icon: ChartMixed, label: "Analytics Overview", href: "/dashboard/admin/analytics" },
 ];

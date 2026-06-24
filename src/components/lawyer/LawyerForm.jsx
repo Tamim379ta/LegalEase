@@ -81,7 +81,6 @@ const LawyerForm = ({ onSuccess }) => {
     e.preventDefault();
     setError(null);
 
-    // Guard: session not ready yet, or user not logged in
     if (sessionPending) {
       setError("Still checking your session, please try again in a moment.");
       return;
@@ -109,7 +108,7 @@ const LawyerForm = ({ onSuccess }) => {
       setUploadingPhoto(false);
 
       setSubmitting(true);
-      await updateUserProfile({ role: "lawyer"});
+      await updateUserProfile({ role: "lawyer" ,  userId: userId});
 
       await createLawyerProfile({
         lawyerId: userId,
