@@ -1,5 +1,5 @@
 "use server"
-import { serverFetch } from "../core/server"
+import { protectedFetch, serverFetch } from "../core/server"
 import { getUserSession } from "../core/session"
 
 export const getAllLawyers = async ({ search = '', category = '', page = 1 } = {}) => {
@@ -14,7 +14,7 @@ export const getAllLawyers = async ({ search = '', category = '', page = 1 } = {
 }
 
 export const manageLawyers = async () => {
-  return await serverFetch('/manage-lawyers')
+  return await protectedFetch('/manage-lawyers')
 }
 
 export const topLawyers = async () => {

@@ -3,6 +3,7 @@
 import { sendBooking } from "@/lib/action/booking";
 import { authClient } from "@/lib/auth-client";
 import { Button, Modal } from "@heroui/react";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -16,6 +17,7 @@ const BookingBtn = ({ lawyer, allBookings }) => {
   if (isPending) return null;
 
   const user = session?.user;
+
   const isLawyer = user?.role === "lawyer";
 
   const existingBooking = allBookings?.find(
@@ -34,6 +36,11 @@ const BookingBtn = ({ lawyer, allBookings }) => {
   };
 
   const handleConfirm = async () => {
+    if (!user) {
+      redirect('/signIn')
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await sendBooking({
@@ -59,11 +66,10 @@ const BookingBtn = ({ lawyer, allBookings }) => {
       <button
         onClick={() => !isDisabled && setIsOpen(true)}
         disabled={isDisabled}
-        className={`mt-2 h-12 w-full rounded-xl font-semibold text-white transition-all active:scale-[0.98] ${
-          isDisabled
-            ? "cursor-not-allowed bg-gray-600 opacity-60"
-            : "bg-[#814F30] hover:bg-[#814F30]/90"
-        }`}
+        className={`mt-2 h-12 w-full rounded-xl font-semibold text-white transition-all active:scale-[0.98] ${isDisabled
+          ? "cursor-not-allowed bg-gray-600 opacity-60"
+          : "bg-[#814F30] hover:bg-[#814F30]/90"
+          }`}
       >
         {getButtonLabel()}
       </button>
