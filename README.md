@@ -106,7 +106,7 @@ legalease/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/legalease.git
+git clone https://github.com/Tamim379ta/LegalEase.git
 cd legalease
 ```
 
