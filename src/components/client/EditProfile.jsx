@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaUserEdit } from "react-icons/fa";
 import { Button, Input, Label, Modal, Surface, TextField } from "@heroui/react";
-import { updateUserProfile } from "@/lib/action/userRole";
+import {  updateUserProfileWithImage } from "@/lib/action/userRole";
 
 export function EditProfileModal({ initialUser }) {
   const router = useRouter();
@@ -49,7 +49,7 @@ export function EditProfileModal({ initialUser }) {
         }
       }
 
-      await updateUserProfile({ name, image: uploadedImageUrl });
+      await updateUserProfileWithImage({ name, image: uploadedImageUrl });
 
       router.refresh();
       setIsOpen(false);
