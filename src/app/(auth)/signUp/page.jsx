@@ -75,7 +75,7 @@ const SignUpPage = () => {
         )}
 
         {/* Form */}
-        <Form onSubmit={handleSubmit} className="flex flex-col gap-5">
+        <Form onSubmit={handleSubmit} className="flex flex-col gap-3">
 
           {/* Full Name Field */}
           <TextField name="name" type="text" isRequired className="w-full flex flex-col gap-1.5">
@@ -136,7 +136,7 @@ const SignUpPage = () => {
         </Form>
 
         {/* Divider */}
-        <div className="my-6 flex items-center">
+        <div className="my-3 flex items-center">
           <div className="h-px flex-1 bg-slate-500/20" />
           <span className="px-3 text-xs font-medium text-slate-500 tracking-wider">OR</span>
           <div className="h-px flex-1 bg-slate-500/20" />
@@ -144,7 +144,7 @@ const SignUpPage = () => {
 <button
   type="button"
   onClick={handleGoogleSignIn}
-  className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#2A486A] bg-[#1A2E44]/80 text-sm font-medium text-white transition-all hover:border-[#814f30]/60 hover:bg-[#1A2E44] active:scale-[0.98]"
+  className="flex mb-2 h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#2A486A] bg-[#1A2E44]/80 text-sm font-medium text-white transition-all hover:border-[#814f30]/60 hover:bg-[#1A2E44] active:scale-[0.98]"
 >
   <img src="https://www.google.com/favicon.ico" className="h-4 w-4" />
   Continue with Google
