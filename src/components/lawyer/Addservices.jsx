@@ -5,6 +5,7 @@ import { Briefcase } from "@gravity-ui/icons";
 import { FaPlus } from "react-icons/fa6";
 import { Button, Input, Label, Modal, Surface, TextField, Dropdown } from "@heroui/react";
 import { addServices } from "@/lib/action/addServices";
+import { useRouter } from "next/navigation";
 
 const SPECIALIZATIONS = [
   "Family Law",
@@ -22,6 +23,7 @@ const SPECIALIZATIONS = [
 export default function AddServicesModal({ lawyerId }) {
   const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter()
 
   const [form, setForm] = useState({
     specialization: "",
@@ -43,6 +45,7 @@ export default function AddServicesModal({ lawyerId }) {
       try {
         await addServices(data);
         setForm({ specialization: "", fee: "", status: "available" });
+        router.refresh()
         setIsOpen(false);
       } catch (error) {
         console.error("Failed to add service:", error);

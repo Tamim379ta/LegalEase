@@ -13,6 +13,7 @@ import {
   TextArea,
   Surface,
 } from "@heroui/react";
+import { useRouter } from "next/navigation";
 
 const SPECIALIZATIONS = [
   "Family Law",
@@ -35,6 +36,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
+  const router = useRouter()
 
   const [form, setForm] = useState({
     name: lawyerData?.name || "",
@@ -106,6 +108,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
           photoUrl: finalPhotoUrl,
         }),
       });
+      router.refresh()
 
       const resData = await response.json();
 
@@ -134,9 +137,9 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
             <Modal.CloseTrigger className="text-gray-400 hover:text-white" />
 
             <Modal.Header className="!bg-[#0a121c]">
-             
+
               <Modal.Heading className="text-white font-semibold">Edit Profile Information</Modal.Heading>
-              
+
             </Modal.Header>
 
             <Modal.Body className="!bg-[#0a121c] p-6">
@@ -229,8 +232,8 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
                           type="button"
                           onClick={() => setForm((prev) => ({ ...prev, status: value }))}
                           className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${form.status === value
-                              ? "border-[#814f30] bg-[#814f30]/20 text-white"
-                              : "border-[#1a4060] bg-[#0a121c]/80 text-gray-400 hover:border-[#814f30]/40"
+                            ? "border-[#814f30] bg-[#814f30]/20 text-white"
+                            : "border-[#1a4060] bg-[#0a121c]/80 text-gray-400 hover:border-[#814f30]/40"
                             }`}
                         >
                           {value === "available" ? "Available" : "Busy"}
