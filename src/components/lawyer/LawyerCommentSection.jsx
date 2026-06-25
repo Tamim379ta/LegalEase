@@ -2,14 +2,12 @@ import { getAllComments } from '@/lib/api/comments';
 import { getUserSession } from '@/lib/core/session';
 import CommentInput from './CommentInput';
 
-const LawyerCommentSection = async ({ lawyerId, allBookings }) => {
+const LawyerCommentSection = async ({ lawyerId, name, allBookings }) => {
   const user = await getUserSession();
   const allComments = await getAllComments();
 
-  // Filter comments for this specific lawyer
   const lawyerComments = allComments?.filter((c) => c.lawyerId === lawyerId) || [];
 
-  // Find this user's booking for this lawyer
   const userBooking = allBookings?.find(
     (b) => b.userId === user?.id && b.lawyerId === lawyerId
   );
@@ -50,6 +48,7 @@ const LawyerCommentSection = async ({ lawyerId, allBookings }) => {
           <CommentInput
             userId={user?.id}
             userName={user?.name}
+            lawyerName={name}
             lawyerId={lawyerId}
             disabled={isPending}
           />

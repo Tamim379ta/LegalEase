@@ -137,7 +137,7 @@ const LawyerDetailsPage = async ({ params }) => {
 
       </div>
       <div className="mt-8">
-        <LawyerCommentSection lawyerId={currentLawyerId} allBookings={allBookings} />
+        <LawyerCommentSection name={name} lawyerId={currentLawyerId} allBookings={allBookings} />
       </div>
     </div>
   );

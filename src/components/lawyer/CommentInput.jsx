@@ -1,15 +1,18 @@
 "use client";
 
 import { postComment } from '@/lib/action/comments';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
-const CommentInput = ({ userId, lawyerId, disabled, userName }) => {
+const CommentInput = ({ userId, lawyerId, disabled, userName , lawyerName}) => {
   const [text, setText] = useState("");
+  const router = useRouter()
 
   const handleSubmit = async () => {
     if (!text.trim()) return;
-    await postComment({ userName, text, userId, lawyerId });
+    await postComment({ userName, text, userId, lawyerId, lawyerName  });
     setText("");
+    router.refresh()
   };
 
   return (
