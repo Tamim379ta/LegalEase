@@ -1,5 +1,5 @@
 "use server"
-import { serverFetch } from "../core/server"
+import { protectedFetch, serverFetch } from "../core/server"
 import { getUserSession } from "../core/session"
 
 export const bookingListById = async () => {
@@ -9,5 +9,5 @@ export const bookingListById = async () => {
 }
 
 export  const  getAllBookings = async() => {
-  return await serverFetch('/bookings')
+  return await protectedFetch('/bookings')
 }

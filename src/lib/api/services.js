@@ -1,6 +1,6 @@
 'use server'
-import { serverFetch } from "../core/server"
+import { protectedFetch} from "../core/server"
 
 export const services = async() => {
-  return await serverFetch('/services/lawyers')
+  return await protectedFetch('/services/lawyers')
 }

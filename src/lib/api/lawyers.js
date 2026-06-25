@@ -10,7 +10,7 @@ export const getAllLawyers = async ({ search = '', category = '', page = 1 } = {
   params.set('limit', 8)
 
   const query = params.toString()
-  return serverFetch(`/lawyers${query ? `?${query}` : ''}`)
+  return  serverFetch(`/lawyers${query ? `?${query}` : ''}`)
 }
 
 export const manageLawyers = async () => {
