@@ -34,7 +34,6 @@ const LawyerProfileCard = async () => {
   const statusBadge = statusStyles[currentStatus] || statusStyles.available;
 
   return (
-    // ✅ Removed min-h-screen, bg-gray-50/50, max-w-5xl mx-auto
     <div className="w-full space-y-6">
 
       {/* Edit button */}
@@ -43,7 +42,7 @@ const LawyerProfileCard = async () => {
           lawyerData={lawyer}
           onSave={handleRefresh}
           triggerButton={
-            <Button className="bg-[#1A2E44] text-white font-medium rounded-xl px-4 py-2 flex items-center gap-2 hover:bg-orange-400 transition-colors">
+            <Button className="bg-[#0a121c] text-white font-medium rounded-xl px-4 py-2 flex items-center gap-2 hover:bg-[#0a121c]/80 transition-colors">
               <FaEdit /> Edit Profile
             </Button>
           }
@@ -126,7 +125,7 @@ const LawyerProfileCard = async () => {
                             </span>
                           </Table.Cell>
                           <Table.Cell className="p-4 font-semibold text-black">
-                            ৳{item.fee ? item.fee.toLocaleString() : "0"}
+                            ${item.fee ? item.fee.toLocaleString() : "0"}
                           </Table.Cell>
                           <Table.Cell className="p-4">
                             <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium capitalize ${itemStatusBadge.badge}`}>

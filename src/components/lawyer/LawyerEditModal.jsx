@@ -93,8 +93,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
       setSubmitting(true);
 
       const targetId = lawyerData?._id?.$oid || lawyerData?._id;
-      
-      // Update data block payload targeted directly to your patch endpoint match structure
+
       const response = await fetch(`http://localhost:5000/lawyers/${targetId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -111,7 +110,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
       const resData = await response.json();
 
       if (resData.success) {
-        onSave?.(); // Triggers Server Action to revalidate layout profile cache data
+        onSave?.();
       } else {
         setError(resData.error || "Failed to save profile modifications.");
       }
@@ -131,76 +130,62 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
       {triggerButton || <Button variant="secondary">Edit Profile</Button>}
       <Modal.Backdrop>
         <Modal.Container placement="auto">
-          <Modal.Dialog className="sm:max-w-md border border-[#2E4868] bg-[#0E1B2B]">
+          <Modal.Dialog className="sm:max-w-md border border-[#1a4060] !bg-[#0a121c]">
             <Modal.CloseTrigger className="text-gray-400 hover:text-white" />
-            
-            <Modal.Header>
-              <Modal.Icon className="bg-orange-400/20 text-orange-400">
-                <Person className="size-5" />
-              </Modal.Icon>
+
+            <Modal.Header className="!bg-[#0a121c]">
+             
               <Modal.Heading className="text-white font-semibold">Edit Profile Information</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-gray-400">
-                Modify your public profile details, fees, and current scheduling status.
-              </p>
+              
             </Modal.Header>
 
-            <Modal.Body className="p-6">
+            <Modal.Body className="!bg-[#0a121c] p-6">
               <Surface variant="default" className="bg-transparent border-0 p-0">
                 <form id="edit-lawyer-form" onSubmit={handleSubmit} className="flex flex-col gap-4">
-                  
-                  {/* Photo selection area layout */}
+
+                  {/* Photo */}
                   <div className="flex flex-col items-center gap-3">
-                    <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border border-[#2E4868] bg-[#1A2E44]">
+                    <div className="flex size-24 items-center justify-center overflow-hidden rounded-full border-2 border-[#814f30]/40 bg-[#0a121c]">
                       {photoPreview ? (
-                        <Image
-                          src={photoPreview}
-                          alt="Profile preview"
-                          width={96}
-                          height={96}
-                          className="size-full object-cover"
-                          unoptimized
-                        />
+                        <Image src={photoPreview} alt="Profile preview" width={96} height={96} className="size-full object-cover" unoptimized />
                       ) : (
-                        <span className="text-xs text-gray-400">No photo</span>
+                        <span className="text-xs text-gray-500">No photo</span>
                       )}
                     </div>
-                    <label className="cursor-pointer text-sm font-medium text-orange-300 hover:underline">
+                    <label className="cursor-pointer text-sm font-medium text-[#c8956e] hover:text-[#814f30] transition-colors hover:underline">
                       Change profile photo
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handlePhotoSelect}
-                        className="hidden"
-                      />
+                      <input type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
                     </label>
                   </div>
 
-                  {/* Name Field */}
+                  {/* Name */}
                   <TextField name="name" isRequired className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-white">Full Name</Label>
+                    <Label className="text-xs font-semibold text-gray-300">Full Name</Label>
                     <Input
                       placeholder="e.g. Ayesha Rahman"
                       value={form.name}
                       onChange={handleChange("name")}
-                      className="h-12 w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
+                      className="h-12 w-full rounded-xl border border-[#1a4060] bg-[#0a121c]/80 px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814f30]/70 focus:outline-none transition-colors hover:border-[#814f30]/40"
                     />
                   </TextField>
 
-                  {/* Specialization Field */}
+                  {/* Specialization */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-white">Specialization *</label>
+                    <label className="text-xs font-semibold text-gray-300">Specialization *</label>
                     <Dropdown>
-                      <Dropdown.Trigger className="h-12 w-full justify-between rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-left text-sm text-white hover:border-orange-400/50">
-                        {form.specialization || "Select a specialization"}
-                        <span className="text-xs text-gray-400">▼</span>
+                      <Dropdown.Trigger className="h-12 w-full justify-between rounded-xl border border-[#1a4060] bg-[#0a121c]/80 px-3 text-left text-sm text-white hover:border-[#814f30]/40 transition-colors">
+                        <span className={form.specialization ? "text-white" : "text-gray-500"}>
+                          {form.specialization || "Select a specialization"}
+                        </span>
+                        <span className="text-xs text-gray-500">▼</span>
                       </Dropdown.Trigger>
-                      <Dropdown.Popover className="border border-[#2E4868] bg-[#1A2E44]">
+                      <Dropdown.Popover className="border border-[#1a4060] bg-[#0a121c]">
                         <Dropdown.Menu>
                           {SPECIALIZATIONS.map((spec) => (
                             <Dropdown.Item
                               key={spec}
                               onClick={() => handleSpecializationChange(spec)}
-                              className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-orange-400/20"
+                              className="cursor-pointer px-3 py-2 text-sm text-white hover:bg-[#814f30]/20 transition-colors"
                             >
                               <Label className="cursor-pointer text-white">{spec}</Label>
                             </Dropdown.Item>
@@ -210,44 +195,43 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
                     </Dropdown>
                   </div>
 
-                  {/* Bio Field */}
+                  {/* Bio */}
                   <TextField name="bio" isRequired className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-white">Bio / Professional Summary</Label>
+                    <Label className="text-xs font-semibold text-gray-300">Bio / Professional Summary</Label>
                     <TextArea
                       placeholder="Briefly describe your experience..."
                       value={form.bio}
                       onChange={handleChange("bio")}
                       rows={4}
-                      className="w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 py-2 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
+                      className="w-full rounded-xl border border-[#1a4060] bg-[#0a121c]/80 px-3 py-2.5 text-sm text-white placeholder:text-gray-500 focus:border-[#814f30]/70 focus:outline-none transition-colors hover:border-[#814f30]/40 resize-none"
                     />
                   </TextField>
 
-                  {/* Fee Field */}
+                  {/* Fee */}
                   <TextField name="fee" type="number" isRequired className="flex flex-col gap-1.5">
-                    <Label className="text-sm font-medium text-white">Consultation Fee</Label>
+                    <Label className="text-xs font-semibold text-gray-300">Consultation Fee ($)</Label>
                     <Input
                       placeholder="e.g. 2000"
                       value={form.fee}
                       onChange={handleChange("fee")}
                       min={0}
-                      className="h-12 w-full rounded-xl border border-[#2E4868] bg-[#1A2E44] px-3 text-sm text-white placeholder:text-gray-500 focus:border-orange-400 focus:outline-none"
+                      className="h-12 w-full rounded-xl border border-[#1a4060] bg-[#0a121c]/80 px-3 text-sm text-white placeholder:text-gray-500 focus:border-[#814f30]/70 focus:outline-none transition-colors hover:border-[#814f30]/40"
                     />
                   </TextField>
 
-                  {/* Status Toggle Blocks */}
+                  {/* Status */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-sm font-medium text-white">Status</label>
+                    <label className="text-xs font-semibold text-gray-300">Availability Status</label>
                     <div className="flex gap-3">
                       {["available", "busy"].map((value) => (
                         <button
                           key={value}
                           type="button"
                           onClick={() => setForm((prev) => ({ ...prev, status: value }))}
-                          className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${
-                            form.status === value
-                              ? "border-orange-400 bg-orange-400/20 text-white"
-                              : "border-[#2E4868] bg-[#1A2E44] text-gray-400 hover:border-orange-400/50"
-                          }`}
+                          className={`flex-1 rounded-xl border py-2.5 text-sm font-medium capitalize transition-all ${form.status === value
+                              ? "border-[#814f30] bg-[#814f30]/20 text-white"
+                              : "border-[#1a4060] bg-[#0a121c]/80 text-gray-400 hover:border-[#814f30]/40"
+                            }`}
                         >
                           {value === "available" ? "Available" : "Busy"}
                         </button>
@@ -256,7 +240,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
                   </div>
 
                   {error && (
-                    <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
+                    <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-300">
                       {error}
                     </p>
                   )}
@@ -264,8 +248,8 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
               </Surface>
             </Modal.Body>
 
-            <Modal.Footer className="border-t border-[#2E4868]/40 pt-4">
-              <Button slot="close" variant="secondary" className="border-[#2E4868] text-white">
+            <Modal.Footer className="border-t border-[#1a4060]/40 !bg-[#0a121c] pt-4">
+              <Button slot="close" variant="secondary" className="border-[#1a4060] text-black">
                 Cancel
               </Button>
               <Button
@@ -273,7 +257,7 @@ export function EditLawyerModal({ lawyerData, onSave, triggerButton }) {
                 form="edit-lawyer-form"
                 slot={!isBusy ? "close" : undefined}
                 isDisabled={isBusy}
-                className="rounded-xl bg-[#814f30] font-semibold text-white transition-all hover:bg-orange-400 disabled:opacity-50"
+                className="rounded-xl bg-[#814f30] font-semibold text-white transition-all hover:bg-[#814f30]/80 disabled:opacity-50"
               >
                 {uploadingPhoto ? "Uploading..." : submitting ? "Saving..." : "Save Changes"}
               </Button>

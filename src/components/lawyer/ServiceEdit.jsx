@@ -13,7 +13,7 @@ export default function ServiceActions({ item, handleRefresh }) {
   const handleDeleteExecute = async () => {
     setIsDeleting(true);
     const targetId = item._id?.$oid || item._id;
-   const res = deleteLawyerServices(targetId)
+    const res = deleteLawyerServices(targetId)
   };
 
   return (
@@ -38,7 +38,7 @@ export default function ServiceActions({ item, handleRefresh }) {
         <Button
           isIconOnly
           variant="light"
-          className="text-gray-400 hover:text-red-600 min-w-8 w-8 h-8 rounded-lg hover:bg-red-50"
+          className="text-gray-400 hover:text-red-400 min-w-8 w-8 h-8 rounded-lg hover:bg-red-500/10"
           aria-label="Remove legal service type"
         >
           <FaTrashAlt className="text-xs" />
@@ -46,27 +46,29 @@ export default function ServiceActions({ item, handleRefresh }) {
 
         <Modal.Backdrop>
           <Modal.Container>
-            <Modal.Dialog className="sm:max-w-[380px] border border-[#2E4868] bg-[#0E1B2B]">
+            <Modal.Dialog className="sm:max-w-[380px] border border-[#1a4060] !bg-[#0a121c]">
               <Modal.CloseTrigger className="text-gray-400 hover:text-white" />
 
-              <Modal.Header>
+              <Modal.Header className="!bg-[#0a121c]">
                 <Modal.Icon className="bg-rose-500/20 text-rose-400">
                   <TrashBin className="size-5" />
                 </Modal.Icon>
                 <Modal.Heading className="text-white font-semibold">Delete Service</Modal.Heading>
               </Modal.Header>
 
-              <Modal.Body>
-                <p className="text-sm text-gray-300">
-                  Are you sure you want to remove the <strong className="text-white">{item.specialization}</strong> domain profile service package? This action cannot be reversed.
+              <Modal.Body className="!bg-[#0a121c]">
+                <p className="text-sm text-gray-400">
+                  Are you sure you want to remove the{" "}
+                  <strong className="text-[#c8956e]">{item.specialization}</strong>{" "}
+                  domain profile service package? This action cannot be reversed.
                 </p>
               </Modal.Body>
 
-              <Modal.Footer className="flex gap-2">
+              <Modal.Footer className="flex gap-2 border-t border-[#1a4060]/40 !bg-[#0a121c] pt-4">
                 <Button
                   slot="close"
                   variant="secondary"
-                  className="flex-1 border-[#2E4868] text-white"
+                  className="flex-1 border-[#1a4060] text-black"
                   isDisabled={isDeleting}
                 >
                   Cancel

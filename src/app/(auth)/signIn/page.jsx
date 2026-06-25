@@ -40,6 +40,13 @@ const SignInPage = () => {
     }, 1000);
   };
 
+ const handleGoogleSignIn = async () => {
+  await authClient.signIn.social({
+    provider: "google",
+    callbackURL: "/",
+    newUserCallbackURL: "/onboarding",
+  });
+};
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0e345c] px-4">
       {/* Background Glow Accents */}
@@ -125,6 +132,15 @@ const SignInPage = () => {
           <span className="px-3 text-xs font-medium text-slate-500 tracking-wider">OR</span>
           <div className="h-px flex-1 bg-slate-500/20" />
         </div>
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#2A486A] bg-[#1A2E44]/80 text-sm font-medium text-white transition-all hover:border-[#814f30]/60 hover:bg-[#1A2E44] active:scale-[0.98]"
+        >
+          <img src="https://www.google.com/favicon.ico" className="h-4 w-4" />
+
+          Continue with Google
+        </button>
 
         {/* Footer */}
         <p className="text-center text-sm text-slate-300">

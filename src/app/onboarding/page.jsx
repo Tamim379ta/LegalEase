@@ -1,16 +1,29 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Modal } from "@heroui/react";
 import { FaUserTie, FaUser } from "react-icons/fa";
 import LawyerForm from "./../../components/lawyer/LawyerForm";
 import { updateUserProfile } from "@/lib/action/userRole";
+import { authClient } from "@/lib/auth-client";
 
 const ChooseRolePage = () => {
   const router = useRouter();
   const [selected, setSelected] = useState(null);
   const [lawyerModalOpen, setLawyerModalOpen] = useState(false);
+
+  const { data: session, isPending } = authClient.useSession();
+  const role = session?.user?.role;
+
+  useEffect(() => {
+    if (!isPending && (role === "admin" || role === "client" || role === "lawyer")) {
+      router.replace("/unauthorized");
+    }
+  }, [isPending, role, router]);
+
+  if (isPending) return null;
+  if (role === "admin" || role === "client" || role === "lawyer") return null;
 
   const handleSelectLawyer = () => {
     setSelected("lawyer");
@@ -19,8 +32,7 @@ const ChooseRolePage = () => {
 
   const handleContinue = async () => {
     if (!selected || selected === "lawyer") return;
-
-    const updateRole = await updateUserProfile({role: selected});
+    const updateRole = await updateUserProfile({ role: selected, userId: session?.user?.id });
     if (updateRole) {
       router.push("/");
     }
@@ -40,11 +52,10 @@ const ChooseRolePage = () => {
           <button
             type="button"
             onClick={() => setSelected("client")}
-            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${
-              selected === "client"
-                ? "border-[#814f30] bg-[#814f30]/20"
-                : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
-            }`}
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "client"
+              ? "border-[#814f30] bg-[#814f30]/20"
+              : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
+              }`}
           >
             <FaUser className="text-xl text-[#d09a75]" />
             <div>
@@ -55,11 +66,10 @@ const ChooseRolePage = () => {
           <button
             type="button"
             onClick={handleSelectLawyer}
-            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${
-              selected === "lawyer"
-                ? "border-[#814f30] bg-[#814f30]/20"
-                : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
-            }`}
+            className={`flex flex-col py-2 items-center justify-center gap-2 rounded-2xl border p-6 text-center transition-all ${selected === "lawyer"
+              ? "border-[#814f30] bg-[#814f30]/20"
+              : "border-[#27405d] bg-[#102235]/60 hover:border-[#814f30]/50"
+              }`}
           >
             <FaUserTie className="text-xl text-[#d09a75]" />
             <div>
@@ -79,19 +89,17 @@ const ChooseRolePage = () => {
         )}
       </div>
 
-      {/* Controlled modal: opens when the Lawyer card is selected */}
       <Modal isOpen={lawyerModalOpen} onOpenChange={setLawyerModalOpen}>
         <Modal.Backdrop>
           <Modal.Container placement="auto">
-            <Modal.Dialog className="sm:max-w-md">
-              <Modal.CloseTrigger />
-              <Modal.Header>
-                <Modal.Heading>Lawyer Profile</Modal.Heading>
-                <p className="mt-1.5 text-sm leading-5 text-muted">
-                  Tell us about your practice so clients can find and hire you.
-                </p>
+            <Modal.Dialog className="sm:max-w-md !bg-[#0a121c] border border-[#1a4060]">
+              <Modal.CloseTrigger className="text-gray-400 hover:text-white" />
+              <Modal.Header className="!bg-[#0a121c]">
+               
+                <Modal.Heading className="text-white font-semibold">Lawyer Profile</Modal.Heading>
+                
               </Modal.Header>
-              <Modal.Body className="p-6">
+              <Modal.Body className="!bg-[#0a121c] p-6">
                 <LawyerForm onSuccess={() => setLawyerModalOpen(false)} />
               </Modal.Body>
             </Modal.Dialog>

@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { Table, Button } from "@heroui/react";
-import { updateUserProfile, deleteUser } from "@/lib/action/userRole"; 
+import { updateUserProfile, deleteUser } from "@/lib/action/userRole";
+import { DeleteUserButton } from "../lawyer/DeleteUserButton";
 
 const roleStyles = {
   lawyer: {
@@ -33,7 +34,7 @@ const UserTable = ({ users: initialUsers = [] }) => {
 
     try {
       await updateUserProfile({ userId: currentId, role: newRole });
-      
+
       setUsers((prevUsers) =>
         prevUsers.map((u) => {
           const uId = u._id?.$oid || u._id;
@@ -57,7 +58,7 @@ const UserTable = ({ users: initialUsers = [] }) => {
 
     try {
       await deleteUser({ userId: currentId });
-      
+
       setUsers((prevUsers) => prevUsers.filter((u) => (u._id?.$oid || u._id) !== currentId));
     } catch (error) {
       console.error("Failed to delete user from DB:", error);
@@ -111,25 +112,31 @@ const UserTable = ({ users: initialUsers = [] }) => {
                         <Button
                           isDisabled={isAdmin}
                           onClick={() => handleToggleRole(user)}
-                          className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors ${
-                            isAdmin 
-                              ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed" 
+                          className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors ${isAdmin
+                              ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
                               : "border-[#1A2E44] text-black hover:bg-gray-100"
-                          }`}
+                            }`}
                         >
                           Change Role
                         </Button>
-                        <Button
-                          isDisabled={isAdmin}
-                          onClick={() => handleDelete(user)}
-                          className={`h-8 rounded-lg border px-3 text-xs font-semibold transition-colors ${
-                            isAdmin 
-                              ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed" 
-                              : "border-red-500/40 bg-red-500/5 text-red-700 hover:bg-red-500/10"
-                          }`}
-                        >
-                          Delete
-                        </Button>
+
+                        {isAdmin ? (
+                          <Button
+                            isDisabled
+                            className="h-8 rounded-lg border border-gray-200 bg-gray-50 px-3 text-xs font-semibold text-gray-400 cursor-not-allowed"
+                          >
+                            Delete
+                          </Button>
+                        ) : (
+                          <DeleteUserButton
+                            user={user}
+                            onDeleted={(deletedId) =>
+                              setUsers((prev) =>
+                                prev.filter((u) => (u._id?.$oid || u._id) !== deletedId)
+                              )
+                            }
+                          />
+                        )}
                       </div>
                     </Table.Cell>
                   </Table.Row>
