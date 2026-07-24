@@ -9,10 +9,12 @@ export default async function SuccessPage({ searchParams }) {
 
   const session = await stripe.checkout.sessions.retrieve(sessionId)
 
-  if (session.payment_status === 'paid') {
-    const { lawyerId, clientId, hiringId } = session.metadata
+ if (session.payment_status === 'paid') {
+  const { lawyerId, clientId, hiringId } = session.metadata
+  
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/payments`, {
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/payments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -25,8 +27,14 @@ export default async function SuccessPage({ searchParams }) {
         status: 'paid',
       }),
     })
-  }
 
+    if (!res.ok) {
+      console.error('Payment save failed:', await res.text())
+    }
+  } catch (err) {
+    console.error('Payment fetch error:', err)
+  }
+}
   const amount = (session.amount_total / 100).toFixed(2)
   const currency = session.currency.toUpperCase()
 
